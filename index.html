@@ -19,7 +19,9 @@
             --tag-study: #a2d2ff;
             --tag-work: #bde0fe;
             --tag-fun: #ffafcc;
-            --font-header: 'Mochiy Pop One', sans-serif;
+            --success-color: #57cc99;
+            --error-color: #ff6b6b;
+            --font-header: 'Mochiy+Pop+One', sans-serif;
             --font-body: 'Nunito', sans-serif;
         }
 
@@ -145,13 +147,38 @@
         .post-header { display: flex; justify-content: space-between; align-items: center; }
         .author { font-weight: 700; color: var(--secondary-pink); }
         .timestamp { font-size: 0.8rem; color: #c7a7b4; }
-        .message { font-size: 1rem; line-height: 1.6; word-wrap: break-word; }
+        .message { font-size: 1rem; line-height: 1.6; word-wrap: break-word; white-space: pre-wrap; }
         .post-image { max-width: 100%; border-radius: 15px; margin-top: 5px; }
-        .post-footer { display: flex; justify-content: flex-end; }
+        .post-footer { display: flex; justify-content: space-between; align-items: center; }
         .tag { font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; color: var(--white-color); }
         .tag.study { background-color: var(--tag-study); }
         .tag.work { background-color: var(--tag-work); }
         .tag.fun { background-color: var(--tag-fun); }
+
+        /* --- 帖子操作按钮 --- */
+        .post-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #c7a7b4;
+            margin-left: 10px;
+            transition: color 0.2s;
+        }
+        .post-actions button:hover {
+            color: var(--secondary-pink);
+        }
+        /* --- 帖子编辑区 --- */
+        .edit-textarea {
+            width: 100%;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            border: 1px solid var(--primary-pink);
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 5px;
+            resize: vertical;
+        }
 
         /* --- 悬浮发布按钮 --- */
         #open-composer-btn {
@@ -229,6 +256,36 @@
         #submit-post-btn { background: var(--secondary-pink); color: var(--white-color); }
         #submit-post-btn:disabled { background: var(--primary-pink); cursor: not-allowed; }
         
+        /* --- Toast 提示 --- */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 20px;
+            color: var(--white-color);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.4s ease;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.success { background-color: var(--success-color); }
+        .toast.error { background-color: var(--error-color); }
+
+
         /* --- 移动端适配 --- */
         @media (max-width: 600px) {
             body { align-items: flex-start; }
@@ -254,27 +311,7 @@
         </div>
 
         <div id="post-container">
-            <div class="post" data-category="fun">
-                <div class="post-header">
-                    <span class="author">匿名的兔兔</span>
-                    <span class="timestamp">15分钟前</span>
-                </div>
-                <p class="message">今天买到了超级可爱的草莓蛋糕，感觉一整天的疲惫都被治愈了！🍰</p>
-                <div class="post-footer">
-                    <span class="tag fun">娱乐</span>
-                </div>
             </div>
-             <div class="post" data-category="study">
-                <div class="post-header">
-                    <span class="author">匿名的猫猫</span>
-                    <span class="timestamp">2小时前</span>
-                </div>
-                <p class="message">偷偷说一句，我好喜欢我的同桌呀，他笑起来的样子像阳光一样。✨</p>
-                <div class="post-footer">
-                    <span class="tag study">学习</span>
-                </div>
-            </div>
-        </div>
     </div>
     
     <button id="open-composer-btn">💌</button>
@@ -303,6 +340,9 @@
             </div>
         </div>
     </div>
+    
+    <div id="toast-container"></div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -310,7 +350,6 @@
             const postContainer = document.getElementById('post-container');
             const openComposerBtn = document.getElementById('open-composer-btn');
             const composerModal = document.getElementById('composer-modal');
-            const composerContent = document.querySelector('.composer-content');
             const cancelPostBtn = document.getElementById('cancel-post-btn');
             const submitPostBtn = document.getElementById('submit-post-btn');
             const nicknameInput = document.getElementById('nickname-input');
@@ -319,18 +358,68 @@
             const imageUpload = document.getElementById('image-upload');
             const imagePreviewContainer = document.getElementById('image-preview-container');
             const filterBtns = document.querySelectorAll('.filter-btn');
+            const toastContainer = document.getElementById('toast-container');
 
             // --- State ---
             let uploadedImageSrc = null;
-            const randomNames = ['匿名的猫猫', '匿名的兔兔', '匿名的星星', '匿名的泡芙', '匿名的甜筒', '匿名的云朵'];
+            let posts = []; // 用于存储所有帖子的数组
+
+            // --- 新增：随机昵称词库 ---
+            const randomAdjectives = ['匿名的', '快乐的', '忧郁的', '好奇的', '害羞的', '发呆的', '路过的', '吃瓜的', '打瞌睡的', '奔跑的', '思考中的'];
+            const randomNouns = ['猫猫', '兔兔', '星星', '泡芙', '甜筒', '云朵', '小熊', '奶茶', '布丁', '向日葵', '小狐狸', '水母', '冰淇淋'];
+
+
+            // --- Toast 提示功能 ---
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                toastContainer.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10); 
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 500);
+                }, 3000);
+            }
+
+            // --- 动态时间戳功能 ---
+            function timeAgo(date) {
+                const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+                let interval = seconds / 31536000;
+                if (interval > 1) return Math.floor(interval) + " 年前";
+                interval = seconds / 2592000;
+                if (interval > 1) return Math.floor(interval) + " 个月前";
+                interval = seconds / 86400;
+                if (interval > 1) return Math.floor(interval) + " 天前";
+                interval = seconds / 3600;
+                if (interval > 1) return Math.floor(interval) + " 小时前";
+                interval = seconds / 60;
+                if (interval > 1) return Math.floor(interval) + " 分钟前";
+                return "刚刚";
+            }
+            setInterval(() => {
+                document.querySelectorAll('.post .timestamp').forEach(ts => {
+                    const postDate = ts.parentNode.parentNode.dataset.timestamp;
+                    if(postDate) ts.textContent = timeAgo(postDate);
+                });
+            }, 60000);
+
 
             // --- Nickname Logic ---
+            // --- 修改：使用新的词库生成随机昵称 ---
             function setRandomNickname() {
-                const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+                const adj = randomAdjectives[Math.floor(Math.random() * randomAdjectives.length)];
+                const noun = randomNouns[Math.floor(Math.random() * randomNouns.length)];
+                const randomName = `${adj}${noun}`;
                 nicknameInput.value = randomName;
                 localStorage.setItem('userNickname', randomName);
             }
-
             function loadNickname() {
                 const savedNickname = localStorage.getItem('userNickname');
                 if (savedNickname) {
@@ -339,7 +428,6 @@
                     setRandomNickname();
                 }
             }
-
             randomNicknameBtn.addEventListener('click', setRandomNickname);
             nicknameInput.addEventListener('input', () => {
                 localStorage.setItem('userNickname', nicknameInput.value);
@@ -347,27 +435,19 @@
 
 
             // --- Modal Logic ---
-            function showModal() {
-                composerModal.classList.add('show');
-            }
-
+            function showModal() { composerModal.classList.add('show'); }
             function hideModal() {
                 composerModal.classList.remove('show');
-                // Reset form
                 messageInput.value = '';
                 imagePreviewContainer.innerHTML = '';
                 uploadedImageSrc = null;
-                imageUpload.value = null; // Reset file input
-                document.querySelector('input[name="tag"]:checked').checked = false;
+                imageUpload.value = null;
                 document.getElementById('tag-study').checked = true;
             }
-
             openComposerBtn.addEventListener('click', showModal);
             cancelPostBtn.addEventListener('click', hideModal);
             composerModal.addEventListener('click', (e) => {
-                if (e.target === composerModal) {
-                    hideModal();
-                }
+                if (e.target === composerModal) hideModal();
             });
 
             // --- Image Upload Logic ---
@@ -383,102 +463,175 @@
                 }
             });
 
-
-            // --- Post Creation Logic ---
-            function createPostElement(nickname, message, imageSrc, tag) {
+            // --- Post Creation & Management Logic ---
+            function createPostElement(post) {
                 const postElement = document.createElement('div');
                 postElement.classList.add('post');
-                postElement.dataset.category = tag;
+                postElement.dataset.category = post.tag;
+                postElement.dataset.id = post.id;
+                postElement.dataset.timestamp = post.timestamp;
 
-                // 1. Header
-                const postHeader = document.createElement('div');
-                postHeader.classList.add('post-header');
-                postHeader.innerHTML = `
-                    <span class="author">${nickname || '匿名用户'}</span>
-                    <span class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                `;
-                postElement.appendChild(postHeader);
-
-                // 2. Message
-                const messageP = document.createElement('p');
-                messageP.classList.add('message');
-                messageP.textContent = message;
-                postElement.appendChild(messageP);
-
-                // 3. Image (if exists)
-                if (imageSrc) {
-                    const imageEl = document.createElement('img');
-                    imageEl.classList.add('post-image');
-                    imageEl.src = imageSrc;
-                    postElement.appendChild(imageEl);
-                }
+                const tagText = { 'study': '学习', 'work': '工作', 'fun': '娱乐' }[post.tag];
+                const imageHTML = post.imageSrc ? `<img class="post-image" src="${post.imageSrc}">` : '';
                 
-                // 4. Footer with Tag
-                const postFooter = document.createElement('div');
-                postFooter.classList.add('post-footer');
-                const tagSpan = document.createElement('span');
-                tagSpan.classList.add('tag', tag);
-                tagSpan.textContent = {
-                    'study': '学习',
-                    'work': '工作',
-                    'fun': '娱乐'
-                }[tag];
-                postFooter.appendChild(tagSpan);
-                postElement.appendChild(postFooter);
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <span class="author">${post.nickname || '匿名用户'}</span>
+                        <span class="timestamp">${timeAgo(post.timestamp)}</span>
+                    </div>
+                    <p class="message">${post.message}</p>
+                    ${imageHTML}
+                    <div class="post-footer">
+                        <span class="tag ${post.tag}">${tagText}</span>
+                        <div class="post-actions">
+                            <button class="edit-btn">编辑</button>
+                            <button class="delete-btn">删除</button>
+                        </div>
+                    </div>
+                `;
+                
+                postElement.querySelector('.delete-btn').addEventListener('click', () => {
+                    if (confirm('确定要删除这条悄悄话吗？')) {
+                        deletePost(post.id);
+                    }
+                });
+
+                postElement.querySelector('.edit-btn').addEventListener('click', (e) => {
+                    toggleEditView(postElement, post.id);
+                });
 
                 return postElement;
             }
 
-            submitPostBtn.addEventListener('click', () => {
-                const nickname = nicknameInput.value;
-                const message = messageInput.value;
-                const tag = document.querySelector('input[name="tag"]:checked').value;
+            function toggleEditView(postElement, postId) {
+                const messageP = postElement.querySelector('.message');
+                const postFooter = postElement.querySelector('.post-footer');
+                const originalMessage = messageP.textContent;
 
+                const editContainer = document.createElement('div');
+                editContainer.innerHTML = `
+                    <textarea class="edit-textarea">${originalMessage}</textarea>
+                    <div class="post-actions">
+                        <button class="save-btn">保存</button>
+                        <button class="cancel-edit-btn">取消</button>
+                    </div>
+                `;
+                
+                postElement.replaceChild(editContainer, messageP);
+                postFooter.style.display = 'none';
+
+                editContainer.querySelector('.save-btn').addEventListener('click', () => {
+                    const newText = editContainer.querySelector('.edit-textarea').value;
+                    if (!newText.trim()) {
+                        showToast('内容不能为空哦~', 'error');
+                        return;
+                    }
+                    updatePost(postId, newText);
+                });
+
+                editContainer.querySelector('.cancel-edit-btn').addEventListener('click', () => {
+                    postElement.replaceChild(messageP, editContainer);
+                    postFooter.style.display = 'flex';
+                });
+            }
+
+            submitPostBtn.addEventListener('click', () => {
+                const message = messageInput.value;
                 if (!message.trim()) {
-                    alert('悄悄话不能为空哦~');
+                    showToast('悄悄话不能为空哦~', 'error');
                     return;
                 }
                 
-                const newPost = createPostElement(nickname, message, uploadedImageSrc, tag);
-                postContainer.appendChild(newPost);
-                
-                // Scroll to new post
-                postContainer.scrollTop = postContainer.scrollHeight;
-                
+                const newPostData = {
+                    id: Date.now(),
+                    nickname: nicknameInput.value || '匿名用户',
+                    message: message,
+                    imageSrc: uploadedImageSrc,
+                    tag: document.querySelector('input[name="tag"]:checked').value,
+                    timestamp: new Date().toISOString()
+                };
+
+                addPost(newPostData);
                 hideModal();
+                showToast('发射成功！♡');
             });
+            
+            // --- 数据持久化相关函数 ---
+            function savePostsToLocalStorage() {
+                localStorage.setItem('pink-whisper-posts', JSON.stringify(posts));
+            }
+
+            function addPost(postData) {
+                posts.unshift(postData);
+                savePostsToLocalStorage();
+                renderPosts();
+                postContainer.scrollTop = 0;
+            }
+            
+            function deletePost(postId) {
+                posts = posts.filter(p => p.id !== postId);
+                savePostsToLocalStorage();
+                const postElement = postContainer.querySelector(`.post[data-id="${postId}"]`);
+                if(postElement) {
+                    postElement.style.transition = 'all 0.3s ease';
+                    postElement.style.opacity = '0';
+                    postElement.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        postElement.remove();
+                        showToast('已随风飘走~');
+                    }, 300);
+                }
+            }
+
+            function updatePost(postId, newMessage) {
+                const postIndex = posts.findIndex(p => p.id === postId);
+                if (postIndex > -1) {
+                    posts[postIndex].message = newMessage;
+                    savePostsToLocalStorage();
+                    renderPosts();
+                    showToast('修改成功！');
+                }
+            }
+            
+            function renderPosts() {
+                postContainer.innerHTML = '';
+                const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                const postsToRender = (currentFilter === 'all')
+                    ? posts
+                    : posts.filter(p => p.tag === currentFilter);
+
+                postsToRender.forEach(post => {
+                    const postEl = createPostElement(post);
+                    postContainer.appendChild(postEl);
+                });
+            }
 
 
             // --- Filtering Logic ---
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    // Update active button style
                     filterBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    
-                    const filter = btn.dataset.filter;
-                    const allPosts = postContainer.querySelectorAll('.post');
-                    
-                    allPosts.forEach(post => {
-                        if (filter === 'all' || post.dataset.category === filter) {
-                            post.style.display = 'flex';
-                        } else {
-                            post.style.display = 'none';
-                        }
-                    });
+                    renderPosts();
                 });
             });
 
             // --- Initial Load ---
             function init() {
-                // Add welcome message
-                const welcomePost = createPostElement(
-                    '💌 系统公告',
-                    '欢迎来到粉色告解室 v2.0！点击右下角的信封按钮开始分享吧~ 记住，所有内容（包括图片）在你刷新页面后都会随风飘走哦~',
-                    null,
-                    'fun'
-                );
-                postContainer.prepend(welcomePost);
+                const savedPosts = localStorage.getItem('pink-whisper-posts');
+                if (savedPosts) {
+                    posts = JSON.parse(savedPosts);
+                } else {
+                     posts.push({
+                        id: Date.now(),
+                        nickname: '💌 系统公告',
+                        message: '欢迎来到粉色告解室 v2.2！\n点击右下角的信封按钮开始分享吧~ 你的所有内容都会保存在这个浏览器里哦。',
+                        imageSrc: null,
+                        tag: 'fun',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                renderPosts();
                 loadNickname();
             }
 
