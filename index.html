@@ -350,7 +350,6 @@
             // --- Supabase 设置 ---
             const supabaseUrl = 'https://fdsqgwmaigbnyfcmhzwy.supabase.co';
             const supabaseKey = 'sb_publishable_8ntkLdJah2jTCZghb9RdeQ_GrRrZLw1';
-            // **【重要修复】**：创建一个新的变量名来存储 Supabase 客户端实例
             const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
             
             // --- DOM Elements ---
@@ -385,7 +384,7 @@
                 setTimeout(() => {
                     toast.classList.remove('show');
                     setTimeout(() => { toast.remove(); }, 500);
-                }, 3000);
+                }, 4000); // 延长显示时间以便看到错误信息
             }
 
             // --- 动态时间戳功能 ---
@@ -568,9 +567,13 @@
                     client_timestamp: new Date().toISOString()
                 };
 
-                await addPost(newPostData);
-                hideModal();
-                showToast('发射成功！♡');
+                const success = await addPost(newPostData);
+                
+                if (success) {
+                    hideModal();
+                    showToast('发射成功！♡');
+                }
+                
                 submitPostBtn.disabled = false;
                 submitPostBtn.textContent = '发射♡';
             });
@@ -584,7 +587,7 @@
 
                 if (error) {
                     console.error('Error fetching posts:', error);
-                    showToast('加载帖子失败了...', 'error');
+                    showToast(`加载帖子失败: ${error.message}`, 'error');
                 } else {
                     posts = data;
                     renderPosts();
@@ -598,10 +601,12 @@
                 
                 if (error) {
                     console.error('Error adding post:', error);
-                    showToast('发射失败了...', 'error');
+                    showToast(`发射失败: ${error.message}`, 'error');
+                    return false;
                 } else {
                     await fetchPosts(); 
                     postContainer.scrollTop = 0;
+                    return true;
                 }
             }
             
@@ -613,7 +618,7 @@
 
                 if (error) {
                     console.error('Error deleting post:', error);
-                    showToast('删除失败了...', 'error');
+                    showToast(`删除失败: ${error.message}`, 'error');
                 } else {
                     await fetchPosts();
                     showToast('已随风飘走~');
@@ -628,7 +633,7 @@
 
                 if (error) {
                     console.error('Error updating post:', error);
-                    showToast('修改失败了...', 'error');
+                    showToast(`修改失败: ${error.message}`, 'error');
                 } else {
                     await fetchPosts();
                     showToast('修改成功！');
