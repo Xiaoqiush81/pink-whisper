@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 粉色告解室 🌸</title>
+    <style>
+        /* --- Google 字体 --- */
+        @import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Nunito:wght@400;700&display=swap');
+
+        /* --- 变量定义 --- */
+        :root {
+            --primary-pink: #ffc2d1;
+            --secondary-pink: #ff8fab;
+            --light-pink: #ffe5ec;
+            --text-color: #8c5d6e;
+            --white-color: #ffffff;
+            --shadow-color: rgba(255, 143, 171, 0.3);
+            --font-header: 'Mochiy Pop One', sans-serif;
+            --font-body: 'Nunito', sans-serif;
+        }
+
+        /* --- 全局样式 --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(-45deg, #ffc2d1, #ffe5ec, #ff8fab, #ffc2d1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* --- 主容器 --- */
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            height: 95vh;
+            max-height: 800px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.98);
+            animation: popIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes popIn {
+            to { transform: scale(1); }
+        }
+
+        /* --- 网站标题 --- */
+        header {
+            padding: 20px;
+            text-align: center;
+            background: var(--primary-pink);
+            border-bottom: 2px dashed var(--light-pink);
+        }
+
+        header h1 {
+            font-family: var(--font-header);
+            color: var(--white-color);
+            font-size: 2rem;
+            text-shadow: 2px 2px 5px var(--shadow-color);
+        }
+        
+        header p {
+            color: var(--light-pink);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* --- 帖子展示区 --- */
+        #post-container {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 自定义滚动条样式 */
+        #post-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        #post-container::-webkit-scrollbar-track {
+            background: var(--light-pink);
+            border-radius: 10px;
+        }
+        #post-container::-webkit-scrollbar-thumb {
+            background: var(--primary-pink);
+            border-radius: 10px;
+        }
+        #post-container::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-pink);
+        }
+
+        /* 帖子卡片 */
+        .post {
+            background: var(--white-color);
+            padding: 15px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-left: 5px solid var(--primary-pink);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .post .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: #c7a7b4;
+        }
+        
+        .post .post-header .author {
+            font-weight: 700;
+        }
+
+        .post .message {
+            font-size: 1rem;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+        
+        /* 用户自己发布的帖子样式 */
+        .post.user-post {
+            background: var(--light-pink);
+            border-left: none;
+            border-right: 5px solid var(--secondary-pink);
+            align-self: flex-end;
+            max-width: 85%;
+        }
+
+        /* --- 输入区域 --- */
+        .input-area {
+            padding: 20px;
+            background: var(--white-color);
+            border-top: 2px dashed var(--light-pink);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-area textarea {
+            flex-grow: 1;
+            padding: 15px;
+            border-radius: 20px;
+            border: 2px solid var(--light-pink);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            resize: none;
+            transition: all 0.3s ease;
+            height: 50px;
+        }
+
+        .input-area textarea:focus {
+            outline: none;
+            border-color: var(--primary-pink);
+            box-shadow: 0 0 10px var(--shadow-color);
+        }
+        
+        .input-area button {
+            padding: 0 25px;
+            border-radius: 20px;
+            border: none;
+            background: var(--secondary-pink);
+            color: var(--white-color);
+            font-family: var(--font-header);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--shadow-color);
+        }
+        
+        .input-area button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+        
+        /* --- 移动端适配 --- */
+        @media (max-width: 600px) {
+            body {
+                align-items: flex-start;
+                min-height: -webkit-fill-available; /* iOS Safari 兼容 */
+                height: 100vh;
+            }
+            .chat-container {
+                height: 100%;
+                max-height: 100%;
+                border-radius: 0;
+            }
+            header h1 {
+                font-size: 1.5rem;
+            }
+            .input-area {
+                flex-direction: column;
+            }
+            .input-area button {
+                padding: 15px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <header>
+            <h1>🌸 粉色告解室 🌸</h1>
+            <p>悄悄话，只与世界分享</p>
+        </header>
+
+        <div id="post-container">
+            <div class="post">
+                <div class="post-header">
+                    <span class="author">💌 系统公告</span>
+                    <span class="timestamp">刚刚</span>
+                </div>
+                <p class="message">欢迎来到粉色告解室！这里是一个只属于你的可爱树洞。尽情吐槽，分享你的小秘密吧~ 记住，刷新页面后你的悄悄话就会随风飘走哦~</p>
+            </div>
+            <div class="post">
+                <div class="post-header">
+                    <span class="author">匿名的兔兔</span>
+                    <span class="timestamp">15分钟前</span>
+                </div>
+                <p class="message">今天买到了超级可爱的草莓蛋糕，感觉一整天的疲惫都被治愈了！🍰</p>
+            </div>
+             <div class="post">
+                <div class="post-header">
+                    <span class="author">匿名的猫猫</span>
+                    <span class="timestamp">2小时前</span>
+                </div>
+                <p class="message">偷偷说一句，我好喜欢我的同桌呀，他笑起来的样子像阳光一样。✨</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <textarea id="message-input" placeholder="输入你的悄悄话..." rows="1"></textarea>
+            <button id="send-btn">发射♡</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const postContainer = document.getElementById('post-container');
+            const messageInput = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
+            
+            // 格式化时间
+            function formatTime() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+            
+            // 创建并添加新帖子
+            function addPost(message) {
+                if (!message.trim()) return;
+
+                // 1. 创建帖子元素
+                const postElement = document.createElement('div');
+                postElement.classList.add('post', 'user-post');
+
+                // 2. 创建帖子头部
+                const postHeader = document.createElement('div');
+                postHeader.classList.add('post-header');
+                
+                const authorSpan = document.createElement('span');
+                authorSpan.classList.add('author');
+                authorSpan.textContent = '匿名的你💖';
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.classList.add('timestamp');
+                timeSpan.textContent = formatTime();
+
+                postHeader.appendChild(authorSpan);
+                postHeader.appendChild(timeSpan);
+                
+                // 3. 创建消息内容
+                const messageP = document.createElement('p');
+                messageP.classList.add('message');
+                messageP.textContent = message;
+
+                // 4. 组装并添加到容器
+                postElement.appendChild(postHeader);
+                postElement.appendChild(messageP);
+                postContainer.appendChild(postElement);
+                
+                // 5. 清空输入框并滚动到底部
+                messageInput.value = '';
+                postContainer.scrollTop = postContainer.scrollHeight;
+                
+                // 6. 输入框高度自适应重置
+                messageInput.style.height = '50px';
+            }
+
+            // 发送按钮点击事件
+            sendBtn.addEventListener('click', () => {
+                addPost(messageInput.value);
+            });
+            
+            // 输入框回车事件 (Enter发送, Shift+Enter换行)
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault(); // 阻止默认的回车换行行为
+                    addPost(messageInput.value);
+                }
+            });
+            
+            // 输入框高度自适应
+            messageInput.addEventListener('input', () => {
+                messageInput.style.height = 'auto';
+                messageInput.style.height = (messageInput.scrollHeight) + 'px';
+            });
+            
+            // 页面加载时滚动到底部
+            postContainer.scrollTop = postContainer.scrollHeight;
+        });
+    </script>
+</body>
+</html>
