@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌸 粉色告解室 🌸</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* --- Google 字体 --- */
         @import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Nunito:wght@400;700&display=swap');
@@ -346,12 +345,7 @@
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            // --- Supabase 设置 ---
-            const supabaseUrl = 'https://fdsqgwmaigbnyfcmhzwy.supabase.co';
-            const supabaseKey = 'sb_publishable_8ntkLdJah2jTCZghb9RdeQ_GrRrZLw1';
-            const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-            
+        document.addEventListener('DOMContentLoaded', () => {
             // --- DOM Elements ---
             const postContainer = document.getElementById('post-container');
             const openComposerBtn = document.getElementById('open-composer-btn');
@@ -367,12 +361,13 @@
             const toastContainer = document.getElementById('toast-container');
 
             // --- State ---
-            let uploadedImageFile = null;
-            let posts = []; 
+            let uploadedImageSrc = null;
+            let posts = []; // 用于存储所有帖子的数组
 
-            // --- 随机昵称词库 ---
-            const randomAdjectives = ['匿名的', '快乐的', '忧郁的', '好奇的', '害羞的', '发呆的', '路过的', '吃瓜的', '打瞌睡的', '奔跑的', '思考中的'];
-            const randomNouns = ['猫猫', '兔兔', '星星', '泡芙', '甜筒', '云朵', '小熊', '奶茶', '布丁', '向日葵', '小狐狸', '水母', '冰淇淋'];
+            // --- 新增：随机昵称词库 ---
+            const randomAdjectives = ['匿名的', '快乐的', '忧郁的', '好奇的', '害羞的', '发呆的', '路过的', '吃瓜的', '打瞌睡的', '奔跑的', '思考中的', '春天的', '夏天的', '秋天的', '冬天的', '可怕的'];
+            const randomNouns = ['猫猫', '兔兔', '星星', '泡芙', '甜筒', '云朵', '小熊', '奶茶', '布丁', '向日葵', '小狐狸', '水母', '冰淇淋', '小狗', '太阳', '野猪', '月亮'];
+
 
             // --- Toast 提示功能 ---
             function showToast(message, type = 'success') {
@@ -380,11 +375,17 @@
                 toast.className = `toast ${type}`;
                 toast.textContent = message;
                 toastContainer.appendChild(toast);
-                setTimeout(() => { toast.classList.add('show'); }, 10); 
+
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10); 
+
                 setTimeout(() => {
                     toast.classList.remove('show');
-                    setTimeout(() => { toast.remove(); }, 500);
-                }, 4000); // 延长显示时间以便看到错误信息
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 500);
+                }, 3000);
             }
 
             // --- 动态时间戳功能 ---
@@ -404,12 +405,14 @@
             }
             setInterval(() => {
                 document.querySelectorAll('.post .timestamp').forEach(ts => {
-                    const postDate = ts.dataset.timestamp;
+                    const postDate = ts.parentNode.parentNode.dataset.timestamp;
                     if(postDate) ts.textContent = timeAgo(postDate);
                 });
             }, 60000);
 
+
             // --- Nickname Logic ---
+            // --- 修改：使用新的词库生成随机昵称 ---
             function setRandomNickname() {
                 const adj = randomAdjectives[Math.floor(Math.random() * randomAdjectives.length)];
                 const noun = randomNouns[Math.floor(Math.random() * randomNouns.length)];
@@ -430,13 +433,14 @@
                 localStorage.setItem('userNickname', nicknameInput.value);
             });
 
+
             // --- Modal Logic ---
             function showModal() { composerModal.classList.add('show'); }
             function hideModal() {
                 composerModal.classList.remove('show');
                 messageInput.value = '';
                 imagePreviewContainer.innerHTML = '';
-                uploadedImageFile = null;
+                uploadedImageSrc = null;
                 imageUpload.value = null;
                 document.getElementById('tag-study').checked = true;
             }
@@ -450,10 +454,10 @@
             imageUpload.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    uploadedImageFile = file; 
                     const reader = new FileReader();
                     reader.onload = (event) => {
-                        imagePreviewContainer.innerHTML = `<img src="${event.target.result}" id="image-preview" alt="Image Preview">`;
+                        uploadedImageSrc = event.target.result;
+                        imagePreviewContainer.innerHTML = `<img src="${uploadedImageSrc}" id="image-preview" alt="Image Preview">`;
                     };
                     reader.readAsDataURL(file);
                 }
@@ -465,14 +469,15 @@
                 postElement.classList.add('post');
                 postElement.dataset.category = post.tag;
                 postElement.dataset.id = post.id;
-                
+                postElement.dataset.timestamp = post.timestamp;
+
                 const tagText = { 'study': '学习', 'work': '工作', 'fun': '娱乐' }[post.tag];
-                const imageHTML = post.image_url ? `<img class="post-image" src="${post.image_url}">` : '';
+                const imageHTML = post.imageSrc ? `<img class="post-image" src="${post.imageSrc}">` : '';
                 
                 postElement.innerHTML = `
                     <div class="post-header">
                         <span class="author">${post.nickname || '匿名用户'}</span>
-                        <span class="timestamp" data-timestamp="${post.client_timestamp}">${timeAgo(post.client_timestamp)}</span>
+                        <span class="timestamp">${timeAgo(post.timestamp)}</span>
                     </div>
                     <p class="message">${post.message}</p>
                     ${imageHTML}
@@ -491,13 +496,13 @@
                     }
                 });
 
-                postElement.querySelector('.edit-btn').addEventListener('click', () => {
+                postElement.querySelector('.edit-btn').addEventListener('click', (e) => {
                     toggleEditView(postElement, post.id);
                 });
 
                 return postElement;
             }
-            
+
             function toggleEditView(postElement, postId) {
                 const messageP = postElement.querySelector('.message');
                 const postFooter = postElement.querySelector('.post-footer');
@@ -530,112 +535,60 @@
                 });
             }
 
-            submitPostBtn.addEventListener('click', async () => {
+            submitPostBtn.addEventListener('click', () => {
                 const message = messageInput.value;
-                const nickname = nicknameInput.value || '匿名用户';
-                const tag = document.querySelector('input[name="tag"]:checked').value;
-
                 if (!message.trim()) {
                     showToast('悄悄话不能为空哦~', 'error');
                     return;
                 }
                 
-                submitPostBtn.disabled = true;
-                submitPostBtn.textContent = '发射中...';
-
-                let imageUrl = null;
-                if (uploadedImageFile) {
-                    const filePath = `public/${Date.now()}-${uploadedImageFile.name}`;
-                    const { data, error } = await supabaseClient.storage.from('post-images').upload(filePath, uploadedImageFile);
-                    
-                    if (error) {
-                        showToast('图片上传失败: ' + error.message, 'error');
-                        submitPostBtn.disabled = false;
-                        submitPostBtn.textContent = '发射♡';
-                        return;
-                    }
-
-                    const { data: { publicUrl } } = supabaseClient.storage.from('post-images').getPublicUrl(filePath);
-                    imageUrl = publicUrl;
-                }
-
                 const newPostData = {
-                    nickname: nickname,
+                    id: Date.now(),
+                    nickname: nicknameInput.value || '匿名用户',
                     message: message,
-                    image_url: imageUrl,
-                    tag: tag,
-                    client_timestamp: new Date().toISOString()
+                    imageSrc: uploadedImageSrc,
+                    tag: document.querySelector('input[name="tag"]:checked').value,
+                    timestamp: new Date().toISOString()
                 };
 
-                const success = await addPost(newPostData);
-                
-                if (success) {
-                    hideModal();
-                    showToast('发射成功！♡');
-                }
-                
-                submitPostBtn.disabled = false;
-                submitPostBtn.textContent = '发射♡';
+                addPost(newPostData);
+                hideModal();
+                showToast('发射成功！♡');
             });
             
             // --- 数据持久化相关函数 ---
-            async function fetchPosts() {
-                const { data, error } = await supabaseClient
-                    .from('posts')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    console.error('Error fetching posts:', error);
-                    showToast(`加载帖子失败: ${error.message}`, 'error');
-                } else {
-                    posts = data;
-                    renderPosts();
-                }
+            function savePostsToLocalStorage() {
+                localStorage.setItem('pink-whisper-posts', JSON.stringify(posts));
             }
 
-            async function addPost(postData) {
-                const { error } = await supabaseClient
-                    .from('posts')
-                    .insert([postData]);
-                
-                if (error) {
-                    console.error('Error adding post:', error);
-                    showToast(`发射失败: ${error.message}`, 'error');
-                    return false;
-                } else {
-                    await fetchPosts(); 
-                    postContainer.scrollTop = 0;
-                    return true;
-                }
+            function addPost(postData) {
+                posts.unshift(postData);
+                savePostsToLocalStorage();
+                renderPosts();
+                postContainer.scrollTop = 0;
             }
             
-            async function deletePost(postId) {
-                const { error } = await supabaseClient
-                    .from('posts')
-                    .delete()
-                    .eq('id', postId);
-
-                if (error) {
-                    console.error('Error deleting post:', error);
-                    showToast(`删除失败: ${error.message}`, 'error');
-                } else {
-                    await fetchPosts();
-                    showToast('已随风飘走~');
+            function deletePost(postId) {
+                posts = posts.filter(p => p.id !== postId);
+                savePostsToLocalStorage();
+                const postElement = postContainer.querySelector(`.post[data-id="${postId}"]`);
+                if(postElement) {
+                    postElement.style.transition = 'all 0.3s ease';
+                    postElement.style.opacity = '0';
+                    postElement.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        postElement.remove();
+                        showToast('已随风飘走~');
+                    }, 300);
                 }
             }
 
-            async function updatePost(postId, newMessage) {
-                const { error } = await supabaseClient
-                    .from('posts')
-                    .update({ message: newMessage })
-                    .eq('id', postId);
-
-                if (error) {
-                    console.error('Error updating post:', error);
-                    showToast(`修改失败: ${error.message}`, 'error');
-                } else {
-                    await fetchPosts();
+            function updatePost(postId, newMessage) {
+                const postIndex = posts.findIndex(p => p.id === postId);
+                if (postIndex > -1) {
+                    posts[postIndex].message = newMessage;
+                    savePostsToLocalStorage();
+                    renderPosts();
                     showToast('修改成功！');
                 }
             }
@@ -647,15 +600,12 @@
                     ? posts
                     : posts.filter(p => p.tag === currentFilter);
 
-                if (postsToRender.length === 0) {
-                     postContainer.innerHTML = `<p style="text-align:center; margin-top: 20px;">这里空空如也，快来发布第一条悄悄话吧！</p>`;
-                } else {
-                     postsToRender.forEach(post => {
-                        const postEl = createPostElement(post);
-                        postContainer.appendChild(postEl);
-                    });
-                }
+                postsToRender.forEach(post => {
+                    const postEl = createPostElement(post);
+                    postContainer.appendChild(postEl);
+                });
             }
+
 
             // --- Filtering Logic ---
             filterBtns.forEach(btn => {
@@ -667,9 +617,22 @@
             });
 
             // --- Initial Load ---
-            async function init() {
+            function init() {
+                const savedPosts = localStorage.getItem('pink-whisper-posts');
+                if (savedPosts) {
+                    posts = JSON.parse(savedPosts);
+                } else {
+                     posts.push({
+                        id: Date.now(),
+                        nickname: '💌 系统公告',
+                        message: '欢迎来到粉色告解室 v2.2！\n点击右下角的信封按钮开始分享吧~ 由于笨蛋作者的技术缺陷，目前你的所有内容都会保存在这个浏览器里，刷新页面后也会继续存在',
+                        imageSrc: null,
+                        tag: 'fun',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                renderPosts();
                 loadNickname();
-                await fetchPosts();
             }
 
             init();
