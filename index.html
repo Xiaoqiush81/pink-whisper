@@ -2,147 +2,145 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>🌸 粉色告解室 🌸</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* --- Google 字体 --- */
         @import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Nunito:wght@400;700&display=swap');
-        
+
         /* --- 变量定义 --- */
         :root {
-            --primary-pink: #ffc2d1; 
-            --secondary-pink: #ff8fab; 
-            --light-pink: #ffe5ec; 
-            --text-color: #8c5d6e; 
-            --white-color: #ffffff; 
-            --shadow-color: rgba(255, 143, 171, 0.3); 
-            --tag-study: #a2d2ff; 
-            --tag-work: #bde0fe; 
-            --tag-fun: #ffafcc; 
-            --success-color: #57cc99; 
-            --error-color: #ff6b6b; 
-            --font-header: 'Mochiy Pop One', sans-serif; 
+            --primary-pink: #ffc2d1;
+            --secondary-pink: #ff8fab;
+            --light-pink: #ffe5ec;
+            --text-color: #8c5d6e;
+            --white-color: #ffffff;
+            --shadow-color: rgba(255, 143, 171, 0.3);
+            --tag-study: #a2d2ff;
+            --tag-work: #bde0fe;
+            --tag-fun: #ffafcc;
+            --success-color: #57cc99;
+            --error-color: #ff6b6b;
+            --font-header: 'Mochiy+Pop+One', sans-serif;
             --font-body: 'Nunito', sans-serif;
         }
-        
+
         /* --- 全局样式 --- */
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        body { 
-            font-family: var(--font-body); 
-            background: linear-gradient(-45deg, #ffc2d1, #ffe5ec, #a2d2ff, #ffafcc); 
-            background-size: 400% 400%; 
-            animation: gradientBG 20s ease infinite; 
-            color: var(--text-color); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            overflow: hidden; 
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(-45deg, #ffc2d1, #ffe5ec, #a2d2ff, #ffafcc);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        @keyframes gradientBG { 
-            0% { background-position: 0% 50%; } 
-            50% { background-position: 100% 50%; } 
-            100% { background-position: 0% 50%; } 
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         /* --- 主容器 --- */
-        .chat-container { 
-            width: 100%; 
-            max-width: 600px; 
-            height: 95vh; 
-            max-height: 800px; 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(10px); 
-            border-radius: 30px; 
-            box-shadow: 0 8px 32px 0 var(--shadow-color); 
-            border: 1px solid rgba(255, 255, 255, 0.18); 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-        }
-        
-        /* --- 网站标题 --- */
-        header { 
-            padding: 20px; 
-            text-align: center; 
-            background: var(--primary-pink); 
-            border-bottom: 2px dashed var(--light-pink); 
-            flex-shrink: 0; 
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            height: 95vh;
+            max-height: 800px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        header h1 { 
-            font-family: var(--font-header); 
-            color: var(--white-color); 
-            font-size: 2rem; 
-            text-shadow: 2px 2px 5px var(--shadow-color); 
+        /* --- 网站标题 --- */
+        header {
+            padding: 20px;
+            text-align: center;
+            background: var(--primary-pink);
+            border-bottom: 2px dashed var(--light-pink);
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            font-family: var(--font-header);
+            color: var(--white-color);
+            font-size: 2rem;
+            text-shadow: 2px 2px 5px var(--shadow-color);
         }
         
         /* --- 筛选/分区栏 --- */
-        .filter-bar { 
-            display: flex; 
-            justify-content: center; 
-            gap: 10px; 
-            padding: 15px; 
-            background: rgba(255, 255, 255, 0.7); 
-            flex-shrink: 0; 
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            flex-shrink: 0;
         }
-        
-        .filter-bar button { 
-            padding: 8px 15px; 
-            border: 2px solid var(--primary-pink); 
-            background: var(--white-color); 
-            color: var(--secondary-pink); 
-            font-family: var(--font-body); 
-            font-weight: 700; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
+        .filter-bar button {
+            padding: 8px 15px;
+            border: 2px solid var(--primary-pink);
+            background: var(--white-color);
+            color: var(--secondary-pink);
+            font-family: var(--font-body);
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .filter-bar button:hover {
+            background: var(--light-pink);
+        }
+        .filter-bar button.active {
+            background: var(--secondary-pink);
+            color: var(--white-color);
+            border-color: var(--secondary-pink);
         }
 
-        .filter-bar button:hover { 
-            background: var(--light-pink); 
-        }
-
-        .filter-bar button.active { 
-            background: var(--secondary-pink); 
-            color: var(--white-color); 
-            border-color: var(--secondary-pink); 
-        }
-        
         /* --- 帖子展示区 --- */
-        #post-container { 
-            flex-grow: 1; 
-            padding: 20px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
+        #post-container {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
+        /* 自定义滚动条样式 */
         #post-container::-webkit-scrollbar { width: 8px; }
         #post-container::-webkit-scrollbar-track { background: var(--light-pink); border-radius: 10px; }
         #post-container::-webkit-scrollbar-thumb { background: var(--primary-pink); border-radius: 10px; }
         #post-container::-webkit-scrollbar-thumb:hover { background: var(--secondary-pink); }
-        
-        /* --- 帖子卡片 --- */
-        .post { 
-            background: var(--white-color); 
-            padding: 15px 20px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 15px var(--shadow-color); 
-            opacity: 0; 
-            transform: scale(0.9); 
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
+
+        /* 帖子卡片 */
+        .post {
+            background: var(--white-color);
+            padding: 15px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            opacity: 0;
+            transform: scale(0.9);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         
         @keyframes popIn { to { opacity: 1; transform: scale(1); } }
@@ -157,86 +155,92 @@
         .tag.study { background-color: var(--tag-study); }
         .tag.work { background-color: var(--tag-work); }
         .tag.fun { background-color: var(--tag-fun); }
-        
+
         /* --- 帖子操作按钮 --- */
-        .post-actions button { 
-            background: none; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 0.8rem; 
-            color: #c7a7b4; 
-            margin-left: 10px; 
-            transition: color 0.2s; 
+        .post-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #c7a7b4;
+            margin-left: 10px;
+            transition: color 0.2s;
         }
-        .post-actions button:hover { color: var(--secondary-pink); }
-        
+        .post-actions button:hover {
+            color: var(--secondary-pink);
+        }
         /* --- 帖子编辑区 --- */
-        .edit-textarea { 
-            width: 100%; 
-            font-family: var(--font-body); 
-            font-size: 1rem; 
-            border: 1px solid var(--primary-pink); 
-            border-radius: 8px; 
-            padding: 8px; 
-            margin-top: 5px; 
-            resize: vertical; 
+        .edit-textarea {
+            width: 100%;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            border: 1px solid var(--primary-pink);
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 5px;
+            resize: vertical;
         }
-        
+
         /* --- 悬浮发布按钮 --- */
-        #open-composer-btn { 
-            position: absolute; 
-            bottom: 30px; 
-            right: 30px; 
-            width: 60px; 
-            height: 60px; 
-            background: var(--secondary-pink); 
-            color: var(--white-color); 
-            border: none; 
-            border-radius: 50%; 
-            font-size: 2rem; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            box-shadow: 0 4px 20px var(--shadow-color); 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            z-index: 1000; 
+        #open-composer-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-pink);
+            color: var(--white-color);
+            border: none;
+            border-radius: 50%;
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
         #open-composer-btn:hover { transform: scale(1.1) rotate(15deg); }
-        
+
         /* --- 发布弹窗 --- */
-        #composer-modal { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0, 0, 0, 0.4); 
-            backdrop-filter: blur(5px); 
-            display: none; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 2000; 
-            opacity: 0; 
-            transition: opacity 0.3s ease; 
+        #composer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        #composer-modal.show { display: flex; opacity: 1; }
-        
-        .composer-content { 
-            background: var(--white-color); 
-            padding: 25px; 
-            border-radius: 25px; 
-            width: 90%; 
-            max-width: 500px; 
-            box-shadow: 0 8px 40px rgba(0,0,0,0.2); 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            transform: scale(0.9); 
-            transition: transform 0.3s ease; 
+        #composer-modal.show {
+            display: flex;
+            opacity: 1;
         }
-        #composer-modal.show .composer-content { transform: scale(1); }
-        
+
+        .composer-content {
+            background: var(--white-color);
+            padding: 25px;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        #composer-modal.show .composer-content {
+            transform: scale(1);
+        }
+
         .composer-content h2 { color: var(--secondary-pink); text-align: center; }
         .nickname-area { display: flex; gap: 10px; }
         .nickname-area input { flex-grow: 1; padding: 10px; border: 2px solid var(--light-pink); border-radius: 12px; font-size: 1rem; }
@@ -254,59 +258,65 @@
         #submit-post-btn:disabled { background: var(--primary-pink); cursor: not-allowed; }
         
         /* --- Toast 提示 --- */
-        #toast-container { 
-            position: fixed; 
-            top: 20px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            z-index: 3000; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 10px; 
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
-        
-        .toast { 
-            padding: 12px 20px; 
-            border-radius: 20px; 
-            color: var(--white-color); 
-            font-weight: 700; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            opacity: 0; 
-            transform: translateY(-20px); 
-            transition: all 0.4s ease; 
+        .toast {
+            padding: 12px 20px;
+            border-radius: 20px;
+            color: var(--white-color);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.4s ease;
         }
-        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
         .toast.success { background-color: var(--success-color); }
         .toast.error { background-color: var(--error-color); }
-        
+
+
         /* --- 移动端适配 --- */
-        @media (max-width: 600px) { 
-            body { align-items: flex-start; } 
-            .chat-container { height: 100%; max-height: 100%; border-radius: 0; } 
-            header h1 { font-size: 1.5rem; } 
-            #open-composer-btn { bottom: 20px; right: 20px; } 
+        @media (max-width: 600px) {
+            body { align-items: flex-start; }
+            .chat-container { height: 100%; max-height: 100%; border-radius: 0; }
+            header h1 { font-size: 1.5rem; }
+            #open-composer-btn { bottom: 20px; right: 20px; }
         }
     </style>
 </head>
 <body>
-    
+
     <div class="chat-container">
-        <header>
+    <header>
             <h1>🌸 粉色告解室 🌸</h1>
             <p style="color: var(--white-color); font-family: var(--font-body); margin-top: 5px; text-shadow: 1px 1px 3px var(--shadow-color);">作者：Xiaoqiush</p>
-        </header>
+    </header>
+
         <div class="filter-bar">
             <button class="filter-btn active" data-filter="all">全部</button>
             <button class="filter-btn" data-filter="study">学习</button>
             <button class="filter-btn" data-filter="work">工作</button>
             <button class="filter-btn" data-filter="fun">娱乐</button>
         </div>
-        <div id="post-container"></div>
+
+        <div id="post-container">
+            </div>
     </div>
     
     <button id="open-composer-btn">💌</button>
-    
+
     <div id="composer-modal">
         <div class="composer-content">
             <h2>写下你的悄悄话</h2>
@@ -333,9 +343,16 @@
     </div>
     
     <div id="toast-container"></div>
+
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Elements (保持不变) ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            // --- Supabase 设置 ---
+            const supabaseUrl = 'https://fdsqgwmaigbnyfcmhzwy.supabase.co';
+            const supabaseKey = 'sb_publishable_8ntkLdJah2jTCZghb9RdeQ_GrRrZLw1';
+            const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+            
+            // --- DOM Elements ---
             const postContainer = document.getElementById('post-container');
             const openComposerBtn = document.getElementById('open-composer-btn');
             const composerModal = document.getElementById('composer-modal');
@@ -349,143 +366,114 @@
             const filterBtns = document.querySelectorAll('.filter-btn');
             const toastContainer = document.getElementById('toast-container');
 
-            // --- Supabase 配置 (已为你配置完成!) ---
-            const SUPABASE_URL = 'https://fdsqgwmaigbnyfcmhzwy.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_8ntkLdJah2jTCZghb9RdeQ_GrRrZLw1';
+            // --- State ---
+            let uploadedImageFile = null; // 用于存储待上传的图片文件
+            let posts = []; // 用于存储所有帖子的数组
 
-            const { createClient } = supabase;
-            const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            
-            // --- State (现在由Supabase管理) ---
-            let uploadedImageSrc = null;
+            // --- 随机昵称词库 ---
             const randomAdjectives = ['匿名的', '快乐的', '忧郁的', '好奇的', '害羞的', '发呆的', '路过的', '吃瓜的', '打瞌睡的', '奔跑的', '思考中的'];
             const randomNouns = ['猫猫', '兔兔', '星星', '泡芙', '甜筒', '云朵', '小熊', '奶茶', '布丁', '向日葵', '小狐狸', '水母', '冰淇淋'];
 
 
-            // --- Toast, 时间戳, 昵称, Modal, 图片上传等辅助函数 (保持不变) ---
-            showToast = (message, type = 'success') => { 
-                const toast = document.createElement('div'); 
-                toast.className = `toast ${type}`; 
-                toast.textContent = message; 
-                toastContainer.appendChild(toast); 
-                setTimeout(() => toast.classList.add('show'), 10); 
-                setTimeout(() => { 
-                    toast.classList.remove('show'); 
-                    setTimeout(() => toast.remove(), 500); 
-                }, 3000); 
-            };
+            // --- Toast 提示功能 ---
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                toastContainer.appendChild(toast);
+                setTimeout(() => { toast.classList.add('show'); }, 10); 
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => { toast.remove(); }, 500);
+                }, 3000);
+            }
 
-            timeAgo = (date) => { 
-                const seconds = Math.floor((new Date() - new Date(date)) / 1000); 
-                let interval = seconds / 31536000; 
-                if (interval > 1) return Math.floor(interval) + " 年前"; 
-                interval = seconds / 2592000; 
-                if (interval > 1) return Math.floor(interval) + " 个月前"; 
-                interval = seconds / 86400; 
-                if (interval > 1) return Math.floor(interval) + " 天前"; 
-                interval = seconds / 3600; 
-                if (interval > 1) return Math.floor(interval) + " 小时前"; 
-                interval = seconds / 60; 
-                if (interval > 1) return Math.floor(interval) + " 分钟前"; 
-                return "刚刚"; 
-            };
-
-            setInterval(() => { 
-                document.querySelectorAll('.post .timestamp').forEach(ts => { 
-                    const postDate = ts.dataset.timestamp; 
-                    if (postDate) ts.textContent = timeAgo(postDate); 
-                }); 
+            // --- 动态时间戳功能 ---
+            function timeAgo(date) {
+                const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+                let interval = seconds / 31536000;
+                if (interval > 1) return Math.floor(interval) + " 年前";
+                interval = seconds / 2592000;
+                if (interval > 1) return Math.floor(interval) + " 个月前";
+                interval = seconds / 86400;
+                if (interval > 1) return Math.floor(interval) + " 天前";
+                interval = seconds / 3600;
+                if (interval > 1) return Math.floor(interval) + " 小时前";
+                interval = seconds / 60;
+                if (interval > 1) return Math.floor(interval) + " 分钟前";
+                return "刚刚";
+            }
+            setInterval(() => {
+                document.querySelectorAll('.post .timestamp').forEach(ts => {
+                    const postDate = ts.dataset.timestamp; // 从 data-* 属性读取
+                    if(postDate) ts.textContent = timeAgo(postDate);
+                });
             }, 60000);
 
-            setRandomNickname = () => { 
-                const adj = randomAdjectives[Math.floor(Math.random() * randomAdjectives.length)]; 
-                const noun = randomNouns[Math.floor(Math.random() * randomNouns.length)]; 
-                const randomName = `${adj}${noun}`; 
-                nicknameInput.value = randomName; 
-                localStorage.setItem('userNickname', randomName); 
-            };
-
-            loadNickname = () => { 
-                const savedNickname = localStorage.getItem('userNickname'); 
-                if (savedNickname) { 
-                    nicknameInput.value = savedNickname; 
-                } else { 
-                    setRandomNickname(); 
-                } 
-            };
-
-            randomNicknameBtn.addEventListener('click', setRandomNickname);
-            nicknameInput.addEventListener('input', () => { localStorage.setItem('userNickname', nicknameInput.value); });
-            
-            showModal = () => composerModal.classList.add('show');
-            hideModal = () => { 
-                composerModal.classList.remove('show'); 
-                messageInput.value = ''; 
-                imagePreviewContainer.innerHTML = ''; 
-                uploadedImageSrc = null; 
-                imageUpload.value = null; 
-                document.getElementById('tag-study').checked = true; 
-            };
-
-            openComposerBtn.addEventListener('click', showModal);
-            cancelPostBtn.addEventListener('click', hideModal);
-            composerModal.addEventListener('click', (e) => { if (e.target === composerModal) hideModal(); });
-            
-            imageUpload.addEventListener('change', (e) => { 
-                const file = e.target.files[0]; 
-                if (file) { 
-                    const reader = new FileReader(); 
-                    reader.onload = (event) => { 
-                        uploadedImageSrc = event.target.result; 
-                        imagePreviewContainer.innerHTML = `<img src="${uploadedImageSrc}" id="image-preview" alt="Image Preview">`; 
-                    }; 
-                    reader.readAsDataURL(file); 
-                } 
-            });
-            
-            // --- 核心逻辑：Supabase 数据操作 ---
-            
-            // 渲染帖子
-            async function renderPosts() {
-                postContainer.innerHTML = '加载中...';
-                const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
-                let query = _supabase.from('posts').select('*').order('created_at', { ascending: false });
-                
-                if (currentFilter !== 'all') {
-                    query = query.eq('tag', currentFilter);
-                }
-
-                const { data: posts, error } = await query;
-                
-                if (error) {
-                    console.error('获取数据失败:', error);
-                    postContainer.innerHTML = '加载失败 T_T <br>请检查Supabase URL和Key是否正确配置，以及数据库表是否已创建。';
-                    return;
-                }
-
-                postContainer.innerHTML = '';
-                if (posts.length === 0) {
-                    postContainer.innerHTML = '<p style="text-align:center; margin-top: 20px;">还没有悄悄话，快来发布第一条吧！</p>';
+            // --- Nickname Logic ---
+            function setRandomNickname() {
+                const adj = randomAdjectives[Math.floor(Math.random() * randomAdjectives.length)];
+                const noun = randomNouns[Math.floor(Math.random() * randomNouns.length)];
+                const randomName = `${adj}${noun}`;
+                nicknameInput.value = randomName;
+                localStorage.setItem('userNickname', randomName);
+            }
+            function loadNickname() {
+                const savedNickname = localStorage.getItem('userNickname');
+                if (savedNickname) {
+                    nicknameInput.value = savedNickname;
                 } else {
-                    posts.forEach(post => {
-                        const postEl = createPostElement(post);
-                        postContainer.appendChild(postEl);
-                    });
+                    setRandomNickname();
                 }
             }
-            
-            // 创建帖子DOM元素
+            randomNicknameBtn.addEventListener('click', setRandomNickname);
+            nicknameInput.addEventListener('input', () => {
+                localStorage.setItem('userNickname', nicknameInput.value);
+            });
+
+            // --- Modal Logic ---
+            function showModal() { composerModal.classList.add('show'); }
+            function hideModal() {
+                composerModal.classList.remove('show');
+                messageInput.value = '';
+                imagePreviewContainer.innerHTML = '';
+                uploadedImageFile = null;
+                imageUpload.value = null;
+                document.getElementById('tag-study').checked = true;
+            }
+            openComposerBtn.addEventListener('click', showModal);
+            cancelPostBtn.addEventListener('click', hideModal);
+            composerModal.addEventListener('click', (e) => {
+                if (e.target === composerModal) hideModal();
+            });
+
+            // --- Image Upload Logic ---
+            imageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    uploadedImageFile = file; // 保存文件对象
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        imagePreviewContainer.innerHTML = `<img src="${event.target.result}" id="image-preview" alt="Image Preview">`;
+                    };
+                    reader.readAsDataURL(file); // 用于本地预览
+                }
+            });
+
+            // --- Post Creation & Management Logic ---
             function createPostElement(post) {
                 const postElement = document.createElement('div');
                 postElement.classList.add('post');
+                postElement.dataset.category = post.tag;
                 postElement.dataset.id = post.id;
+                
                 const tagText = { 'study': '学习', 'work': '工作', 'fun': '娱乐' }[post.tag];
-                const imageHTML = post.imageSrc ? `<img class="post-image" src="${post.imageSrc}">` : '';
+                const imageHTML = post.image_url ? `<img class="post-image" src="${post.image_url}">` : '';
                 
                 postElement.innerHTML = `
                     <div class="post-header">
                         <span class="author">${post.nickname || '匿名用户'}</span>
-                        <span class="timestamp" data-timestamp="${post.created_at}">${timeAgo(post.created_at)}</span>
+                        <span class="timestamp" data-timestamp="${post.client_timestamp}">${timeAgo(post.client_timestamp)}</span>
                     </div>
                     <p class="message">${post.message}</p>
                     ${imageHTML}
@@ -498,93 +486,182 @@
                     </div>
                 `;
                 
-                postElement.querySelector('.delete-btn').addEventListener('click', () => { 
-                    if (confirm('确定要删除这条悄悄话吗？')) { 
-                        deletePost(post.id); 
-                    } 
+                postElement.querySelector('.delete-btn').addEventListener('click', () => {
+                    if (confirm('确定要删除这条悄悄话吗？')) {
+                        deletePost(post.id);
+                    }
                 });
-                
-                postElement.querySelector('.edit-btn').addEventListener('click', () => { 
-                    toggleEditView(postElement, post.id, post.message); 
+
+                postElement.querySelector('.edit-btn').addEventListener('click', (e) => {
+                    toggleEditView(postElement, post.id);
                 });
 
                 return postElement;
             }
-
-            // 新增帖子
-            async function addPost() {
-                const message = messageInput.value;
-                if (!message.trim()) { 
-                    showToast('悄悄话不能为空哦~', 'error'); 
-                    return; 
-                }
-                
-                const newPostData = {
-                    nickname: nicknameInput.value || '匿名用户',
-                    message: message,
-                    imageSrc: uploadedImageSrc, // 注意：base64图片会很大，生产环境建议上传到Supabase Storage
-                    tag: document.querySelector('input[name="tag"]:checked').value,
-                };
-
-                const { error } = await _supabase.from('posts').insert([newPostData]);
-                
-                if (error) { 
-                    showToast('发射失败...', 'error'); 
-                    console.error('插入数据失败:', error);
-                } else { 
-                    showToast('发射成功！♡'); 
-                    hideModal(); 
-                    renderPosts(); 
-                }
-            }
-            submitPostBtn.addEventListener('click', addPost);
-
-            // 删除帖子
-            async function deletePost(postId) {
-                const { error } = await _supabase.from('posts').delete().eq('id', postId);
-                if (error) { 
-                    showToast('删除失败', 'error'); 
-                } else { 
-                    showToast('已随风飘走~'); 
-                    renderPosts(); 
-                }
-            }
-
-            // 更新帖子
-            async function updatePost(postId, newMessage) {
-                const { error } = await _supabase.from('posts').update({ message: newMessage }).eq('id', postId);
-                if (error) { 
-                    showToast('修改失败', 'error'); 
-                } else { 
-                    showToast('修改成功！'); 
-                    renderPosts(); 
-                }
-            }
-
-            // 编辑视图
-            function toggleEditView(postElement, postId, originalMessage) {
+            
+            function toggleEditView(postElement, postId) {
                 const messageP = postElement.querySelector('.message');
                 const postFooter = postElement.querySelector('.post-footer');
+                const originalMessage = messageP.textContent;
+
                 const editContainer = document.createElement('div');
-                editContainer.innerHTML = `<textarea class="edit-textarea">${originalMessage}</textarea><div class="post-actions"><button class="save-btn">保存</button><button class="cancel-edit-btn">取消</button></div>`;
+                editContainer.innerHTML = `
+                    <textarea class="edit-textarea">${originalMessage}</textarea>
+                    <div class="post-actions">
+                        <button class="save-btn">保存</button>
+                        <button class="cancel-edit-btn">取消</button>
+                    </div>
+                `;
+                
                 postElement.replaceChild(editContainer, messageP);
                 postFooter.style.display = 'none';
-                
+
                 editContainer.querySelector('.save-btn').addEventListener('click', () => {
                     const newText = editContainer.querySelector('.edit-textarea').value;
-                    if (!newText.trim()) { 
-                        showToast('内容不能为空哦~', 'error'); 
-                        return; 
+                    if (!newText.trim()) {
+                        showToast('内容不能为空哦~', 'error');
+                        return;
                     }
                     updatePost(postId, newText);
                 });
-                
-                editContainer.querySelector('.cancel-edit-btn').addEventListener('click', () => { 
-                    renderPosts(); 
+
+                editContainer.querySelector('.cancel-edit-btn').addEventListener('click', () => {
+                    postElement.replaceChild(messageP, editContainer);
+                    postFooter.style.display = 'flex';
                 });
             }
 
-            // 筛选逻辑
+            submitPostBtn.addEventListener('click', async () => {
+                const message = messageInput.value;
+                const nickname = nicknameInput.value || '匿名用户';
+                const tag = document.querySelector('input[name="tag"]:checked').value;
+
+                if (!message.trim()) {
+                    showToast('悄悄话不能为空哦~', 'error');
+                    return;
+                }
+                
+                submitPostBtn.disabled = true;
+                submitPostBtn.textContent = '发射中...';
+
+                let imageUrl = null;
+                // 如果有图片，先上传图片
+                if (uploadedImageFile) {
+                    const filePath = `public/${Date.now()}-${uploadedImageFile.name}`;
+                    const { data, error } = await supabase.storage.from('post-images').upload(filePath, uploadedImageFile);
+                    
+                    if (error) {
+                        showToast('图片上传失败: ' + error.message, 'error');
+                        submitPostBtn.disabled = false;
+                        submitPostBtn.textContent = '发射♡';
+                        return;
+                    }
+                    // 获取上传后图片的公开 URL
+                    const { data: { publicUrl } } = supabase.storage.from('post-images').getPublicUrl(filePath);
+                    imageUrl = publicUrl;
+                }
+
+                const newPostData = {
+                    nickname: nickname,
+                    message: message,
+                    image_url: imageUrl,
+                    tag: tag,
+                    client_timestamp: new Date().toISOString()
+                };
+
+                await addPost(newPostData);
+                hideModal();
+                showToast('发射成功！♡');
+                submitPostBtn.disabled = false;
+                submitPostBtn.textContent = '发射♡';
+            });
+            
+            // --- 数据持久化相关函数 (已修改为 Supabase 版本) ---
+            async function fetchPosts() {
+                const { data, error } = await supabase
+                    .from('posts')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error fetching posts:', error);
+                    showToast('加载失败了...', 'error');
+                } else {
+                    posts = data;
+                    renderPosts();
+                }
+            }
+
+            async function addPost(postData) {
+                const { data, error } = await supabase
+                    .from('posts')
+                    .insert([postData]);
+                
+                if (error) {
+                    console.error('Error adding post:', error);
+                    showToast('发射失败了...', 'error');
+                } else {
+                    await fetchPosts(); // 重新获取所有帖子来刷新列表
+                    postContainer.scrollTop = 0;
+                }
+            }
+            
+            async function deletePost(postId) {
+                const { error } = await supabase
+                    .from('posts')
+                    .delete()
+                    .eq('id', postId);
+
+                if (error) {
+                    console.error('Error deleting post:', error);
+                    showToast('删除失败了...', 'error');
+                } else {
+                    const postElement = postContainer.querySelector(`.post[data-id="${postId}"]`);
+                    if(postElement) {
+                        postElement.style.transition = 'all 0.3s ease';
+                        postElement.style.opacity = '0';
+                        postElement.style.transform = 'scale(0.8)';
+                        setTimeout(async () => {
+                            await fetchPosts(); // 重新获取数据以保证同步
+                            showToast('已随风飘走~');
+                        }, 300);
+                    }
+                }
+            }
+
+            async function updatePost(postId, newMessage) {
+                const { error } = await supabase
+                    .from('posts')
+                    .update({ message: newMessage })
+                    .eq('id', postId);
+
+                if (error) {
+                    console.error('Error updating post:', error);
+                    showToast('修改失败了...', 'error');
+                } else {
+                    await fetchPosts(); // 更新成功后重新加载
+                    showToast('修改成功！');
+                }
+            }
+            
+            function renderPosts() {
+                postContainer.innerHTML = '';
+                const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                const postsToRender = (currentFilter === 'all')
+                    ? posts
+                    : posts.filter(p => p.tag === currentFilter);
+
+                if (postsToRender.length === 0) {
+                     postContainer.innerHTML = `<p style="text-align:center; margin-top: 20px;">这里空空如也，快来发布第一条悄悄话吧！</p>`;
+                } else {
+                     postsToRender.forEach(post => {
+                        const postEl = createPostElement(post);
+                        postContainer.appendChild(postEl);
+                    });
+                }
+            }
+
+            // --- Filtering Logic ---
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     filterBtns.forEach(b => b.classList.remove('active'));
@@ -593,10 +670,10 @@
                 });
             });
 
-            // 初始化加载
-            function init() {
+            // --- Initial Load ---
+            async function init() {
+                await fetchPosts();
                 loadNickname();
-                renderPosts();
             }
 
             init();
