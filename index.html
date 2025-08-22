@@ -16,6 +16,9 @@
             --text-color: #8c5d6e;
             --white-color: #ffffff;
             --shadow-color: rgba(255, 143, 171, 0.3);
+            --tag-study: #a2d2ff;
+            --tag-work: #bde0fe;
+            --tag-fun: #ffafcc;
             --font-header: 'Mochiy Pop One', sans-serif;
             --font-body: 'Nunito', sans-serif;
         }
@@ -29,14 +32,14 @@
 
         body {
             font-family: var(--font-body);
-            background: linear-gradient(-45deg, #ffc2d1, #ffe5ec, #ff8fab, #ffc2d1);
+            background: linear-gradient(-45deg, #ffc2d1, #ffe5ec, #a2d2ff, #ffafcc);
             background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            animation: gradientBG 20s ease infinite;
             color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             overflow: hidden;
         }
 
@@ -60,12 +63,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transform: scale(0.98);
-            animation: popIn 0.5s ease-out forwards;
-        }
-        
-        @keyframes popIn {
-            to { transform: scale(1); }
         }
 
         /* --- 网站标题 --- */
@@ -74,6 +71,7 @@
             text-align: center;
             background: var(--primary-pink);
             border-bottom: 2px dashed var(--light-pink);
+            flex-shrink: 0;
         }
 
         header h1 {
@@ -83,10 +81,33 @@
             text-shadow: 2px 2px 5px var(--shadow-color);
         }
         
-        header p {
-            color: var(--light-pink);
-            font-size: 0.9rem;
-            margin-top: 5px;
+        /* --- 筛选/分区栏 --- */
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            flex-shrink: 0;
+        }
+        .filter-bar button {
+            padding: 8px 15px;
+            border: 2px solid var(--primary-pink);
+            background: var(--white-color);
+            color: var(--secondary-pink);
+            font-family: var(--font-body);
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .filter-bar button:hover {
+            background: var(--light-pink);
+        }
+        .filter-bar button.active {
+            background: var(--secondary-pink);
+            color: var(--white-color);
+            border-color: var(--secondary-pink);
         }
 
         /* --- 帖子展示区 --- */
@@ -100,20 +121,10 @@
         }
 
         /* 自定义滚动条样式 */
-        #post-container::-webkit-scrollbar {
-            width: 8px;
-        }
-        #post-container::-webkit-scrollbar-track {
-            background: var(--light-pink);
-            border-radius: 10px;
-        }
-        #post-container::-webkit-scrollbar-thumb {
-            background: var(--primary-pink);
-            border-radius: 10px;
-        }
-        #post-container::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary-pink);
-        }
+        #post-container::-webkit-scrollbar { width: 8px; }
+        #post-container::-webkit-scrollbar-track { background: var(--light-pink); border-radius: 10px; }
+        #post-container::-webkit-scrollbar-thumb { background: var(--primary-pink); border-radius: 10px; }
+        #post-container::-webkit-scrollbar-thumb:hover { background: var(--secondary-pink); }
 
         /* 帖子卡片 */
         .post {
@@ -121,117 +132,109 @@
             padding: 15px 20px;
             border-radius: 20px;
             box-shadow: 0 4px 15px var(--shadow-color);
-            border-left: 5px solid var(--primary-pink);
             opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .post .post-header {
+            transform: scale(0.9);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 0.8rem;
-            color: #c7a7b4;
-        }
-        
-        .post .post-header .author {
-            font-weight: 700;
-        }
-
-        .post .message {
-            font-size: 1rem;
-            line-height: 1.6;
-            word-wrap: break-word;
-        }
-        
-        /* 用户自己发布的帖子样式 */
-        .post.user-post {
-            background: var(--light-pink);
-            border-left: none;
-            border-right: 5px solid var(--secondary-pink);
-            align-self: flex-end;
-            max-width: 85%;
-        }
-
-        /* --- 输入区域 --- */
-        .input-area {
-            padding: 20px;
-            background: var(--white-color);
-            border-top: 2px dashed var(--light-pink);
-            display: flex;
+            flex-direction: column;
             gap: 10px;
         }
         
-        .input-area textarea {
-            flex-grow: 1;
-            padding: 15px;
-            border-radius: 20px;
-            border: 2px solid var(--light-pink);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            resize: none;
-            transition: all 0.3s ease;
-            height: 50px;
-        }
-
-        .input-area textarea:focus {
-            outline: none;
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 10px var(--shadow-color);
-        }
+        @keyframes popIn { to { opacity: 1; transform: scale(1); } }
         
-        .input-area button {
-            padding: 0 25px;
-            border-radius: 20px;
-            border: none;
+        .post-header { display: flex; justify-content: space-between; align-items: center; }
+        .author { font-weight: 700; color: var(--secondary-pink); }
+        .timestamp { font-size: 0.8rem; color: #c7a7b4; }
+        .message { font-size: 1rem; line-height: 1.6; word-wrap: break-word; }
+        .post-image { max-width: 100%; border-radius: 15px; margin-top: 5px; }
+        .post-footer { display: flex; justify-content: flex-end; }
+        .tag { font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; color: var(--white-color); }
+        .tag.study { background-color: var(--tag-study); }
+        .tag.work { background-color: var(--tag-work); }
+        .tag.fun { background-color: var(--tag-fun); }
+
+        /* --- 悬浮发布按钮 --- */
+        #open-composer-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
             background: var(--secondary-pink);
             color: var(--white-color);
-            font-family: var(--font-header);
-            font-size: 1rem;
+            border: none;
+            border-radius: 50%;
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 20px var(--shadow-color);
             cursor: pointer;
             transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        #open-composer-btn:hover { transform: scale(1.1) rotate(15deg); }
+
+        /* --- 发布弹窗 --- */
+        #composer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #composer-modal.show {
+            display: flex;
+            opacity: 1;
         }
 
-        .input-area button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px var(--shadow-color);
+        .composer-content {
+            background: var(--white-color);
+            padding: 25px;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
         }
-        
-        .input-area button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px var(--shadow-color);
+        #composer-modal.show .composer-content {
+            transform: scale(1);
         }
+
+        .composer-content h2 { color: var(--secondary-pink); text-align: center; }
+        .nickname-area { display: flex; gap: 10px; }
+        .nickname-area input { flex-grow: 1; padding: 10px; border: 2px solid var(--light-pink); border-radius: 12px; font-size: 1rem; }
+        .nickname-area button { padding: 0 15px; background: var(--light-pink); color: var(--secondary-pink); border: none; border-radius: 12px; cursor: pointer; }
+        .composer-content textarea { width: 100%; height: 120px; padding: 10px; border: 2px solid var(--light-pink); border-radius: 12px; font-size: 1rem; resize: none; }
+        .composer-content input:focus, .composer-content textarea:focus { outline: none; border-color: var(--primary-pink); }
+        .composer-actions { display: flex; justify-content: space-between; align-items: center; }
+        .tags-selector label { margin-right: 10px; }
+        .image-upload-label { padding: 8px 12px; background: var(--light-pink); border-radius: 12px; cursor: pointer; color: var(--secondary-pink); }
+        #image-preview { max-height: 100px; max-width: 100%; border-radius: 10px; margin-top: 10px; object-fit: cover; }
+        .composer-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .composer-buttons button { flex-grow: 1; padding: 12px; border-radius: 12px; border: none; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; }
+        #cancel-post-btn { background: #eee; color: #888; }
+        #submit-post-btn { background: var(--secondary-pink); color: var(--white-color); }
+        #submit-post-btn:disabled { background: var(--primary-pink); cursor: not-allowed; }
         
         /* --- 移动端适配 --- */
         @media (max-width: 600px) {
-            body {
-                align-items: flex-start;
-                min-height: -webkit-fill-available; /* iOS Safari 兼容 */
-                height: 100vh;
-            }
-            .chat-container {
-                height: 100%;
-                max-height: 100%;
-                border-radius: 0;
-            }
-            header h1 {
-                font-size: 1.5rem;
-            }
-            .input-area {
-                flex-direction: column;
-            }
-            .input-area button {
-                padding: 15px 25px;
-            }
+            body { align-items: flex-start; }
+            .chat-container { height: 100%; max-height: 100%; border-radius: 0; }
+            header h1 { font-size: 1.5rem; }
+            #open-composer-btn { bottom: 20px; right: 20px; }
         }
     </style>
 </head>
@@ -240,115 +243,245 @@
     <div class="chat-container">
         <header>
             <h1>🌸 粉色告解室 🌸</h1>
-            <p>悄悄话，只与世界分享</p>
         </header>
 
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="study">学习</button>
+            <button class="filter-btn" data-filter="work">工作</button>
+            <button class="filter-btn" data-filter="fun">娱乐</button>
+        </div>
+
         <div id="post-container">
-            <div class="post">
-                <div class="post-header">
-                    <span class="author">💌 系统公告</span>
-                    <span class="timestamp">刚刚</span>
-                </div>
-                <p class="message">欢迎来到粉色告解室！这里是一个只属于你的可爱树洞。尽情吐槽，分享你的小秘密吧~ 记住，刷新页面后你的悄悄话就会随风飘走哦~</p>
-            </div>
-            <div class="post">
+            <div class="post" data-category="fun">
                 <div class="post-header">
                     <span class="author">匿名的兔兔</span>
                     <span class="timestamp">15分钟前</span>
                 </div>
                 <p class="message">今天买到了超级可爱的草莓蛋糕，感觉一整天的疲惫都被治愈了！🍰</p>
+                <div class="post-footer">
+                    <span class="tag fun">娱乐</span>
+                </div>
             </div>
-             <div class="post">
+             <div class="post" data-category="study">
                 <div class="post-header">
                     <span class="author">匿名的猫猫</span>
                     <span class="timestamp">2小时前</span>
                 </div>
                 <p class="message">偷偷说一句，我好喜欢我的同桌呀，他笑起来的样子像阳光一样。✨</p>
+                <div class="post-footer">
+                    <span class="tag study">学习</span>
+                </div>
             </div>
         </div>
+    </div>
+    
+    <button id="open-composer-btn">💌</button>
 
-        <div class="input-area">
-            <textarea id="message-input" placeholder="输入你的悄悄话..." rows="1"></textarea>
-            <button id="send-btn">发射♡</button>
+    <div id="composer-modal">
+        <div class="composer-content">
+            <h2>写下你的悄悄话</h2>
+            <div class="nickname-area">
+                <input type="text" id="nickname-input" placeholder="输入你的昵称...">
+                <button id="random-nickname-btn">换一个</button>
+            </div>
+            <textarea id="message-input" placeholder="在这里分享你的故事..."></textarea>
+            <div id="image-preview-container" style="text-align: center;"></div>
+            <div class="composer-actions">
+                <div class="tags-selector">
+                    <input type="radio" id="tag-study" name="tag" value="study" checked> <label for="tag-study">学习</label>
+                    <input type="radio" id="tag-work" name="tag" value="work"> <label for="tag-work">工作</label>
+                    <input type="radio" id="tag-fun" name="tag" value="fun"> <label for="tag-fun">娱乐</label>
+                </div>
+                <label for="image-upload" class="image-upload-label">添加照片</label>
+                <input type="file" id="image-upload" accept="image/*" style="display:none;">
+            </div>
+            <div class="composer-buttons">
+                <button id="cancel-post-btn">取消</button>
+                <button id="submit-post-btn">发射♡</button>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
             const postContainer = document.getElementById('post-container');
+            const openComposerBtn = document.getElementById('open-composer-btn');
+            const composerModal = document.getElementById('composer-modal');
+            const composerContent = document.querySelector('.composer-content');
+            const cancelPostBtn = document.getElementById('cancel-post-btn');
+            const submitPostBtn = document.getElementById('submit-post-btn');
+            const nicknameInput = document.getElementById('nickname-input');
+            const randomNicknameBtn = document.getElementById('random-nickname-btn');
             const messageInput = document.getElementById('message-input');
-            const sendBtn = document.getElementById('send-btn');
-            
-            // 格式化时间
-            function formatTime() {
-                const now = new Date();
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                return `${hours}:${minutes}`;
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            // --- State ---
+            let uploadedImageSrc = null;
+            const randomNames = ['匿名的猫猫', '匿名的兔兔', '匿名的星星', '匿名的泡芙', '匿名的甜筒', '匿名的云朵'];
+
+            // --- Nickname Logic ---
+            function setRandomNickname() {
+                const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+                nicknameInput.value = randomName;
+                localStorage.setItem('userNickname', randomName);
             }
-            
-            // 创建并添加新帖子
-            function addPost(message) {
-                if (!message.trim()) return;
 
-                // 1. 创建帖子元素
+            function loadNickname() {
+                const savedNickname = localStorage.getItem('userNickname');
+                if (savedNickname) {
+                    nicknameInput.value = savedNickname;
+                } else {
+                    setRandomNickname();
+                }
+            }
+
+            randomNicknameBtn.addEventListener('click', setRandomNickname);
+            nicknameInput.addEventListener('input', () => {
+                localStorage.setItem('userNickname', nicknameInput.value);
+            });
+
+
+            // --- Modal Logic ---
+            function showModal() {
+                composerModal.classList.add('show');
+            }
+
+            function hideModal() {
+                composerModal.classList.remove('show');
+                // Reset form
+                messageInput.value = '';
+                imagePreviewContainer.innerHTML = '';
+                uploadedImageSrc = null;
+                imageUpload.value = null; // Reset file input
+                document.querySelector('input[name="tag"]:checked').checked = false;
+                document.getElementById('tag-study').checked = true;
+            }
+
+            openComposerBtn.addEventListener('click', showModal);
+            cancelPostBtn.addEventListener('click', hideModal);
+            composerModal.addEventListener('click', (e) => {
+                if (e.target === composerModal) {
+                    hideModal();
+                }
+            });
+
+            // --- Image Upload Logic ---
+            imageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        uploadedImageSrc = event.target.result;
+                        imagePreviewContainer.innerHTML = `<img src="${uploadedImageSrc}" id="image-preview" alt="Image Preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+
+            // --- Post Creation Logic ---
+            function createPostElement(nickname, message, imageSrc, tag) {
                 const postElement = document.createElement('div');
-                postElement.classList.add('post', 'user-post');
+                postElement.classList.add('post');
+                postElement.dataset.category = tag;
 
-                // 2. 创建帖子头部
+                // 1. Header
                 const postHeader = document.createElement('div');
                 postHeader.classList.add('post-header');
-                
-                const authorSpan = document.createElement('span');
-                authorSpan.classList.add('author');
-                authorSpan.textContent = '匿名的你💖';
-                
-                const timeSpan = document.createElement('span');
-                timeSpan.classList.add('timestamp');
-                timeSpan.textContent = formatTime();
+                postHeader.innerHTML = `
+                    <span class="author">${nickname || '匿名用户'}</span>
+                    <span class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                `;
+                postElement.appendChild(postHeader);
 
-                postHeader.appendChild(authorSpan);
-                postHeader.appendChild(timeSpan);
-                
-                // 3. 创建消息内容
+                // 2. Message
                 const messageP = document.createElement('p');
                 messageP.classList.add('message');
                 messageP.textContent = message;
-
-                // 4. 组装并添加到容器
-                postElement.appendChild(postHeader);
                 postElement.appendChild(messageP);
-                postContainer.appendChild(postElement);
+
+                // 3. Image (if exists)
+                if (imageSrc) {
+                    const imageEl = document.createElement('img');
+                    imageEl.classList.add('post-image');
+                    imageEl.src = imageSrc;
+                    postElement.appendChild(imageEl);
+                }
                 
-                // 5. 清空输入框并滚动到底部
-                messageInput.value = '';
-                postContainer.scrollTop = postContainer.scrollHeight;
-                
-                // 6. 输入框高度自适应重置
-                messageInput.style.height = '50px';
+                // 4. Footer with Tag
+                const postFooter = document.createElement('div');
+                postFooter.classList.add('post-footer');
+                const tagSpan = document.createElement('span');
+                tagSpan.classList.add('tag', tag);
+                tagSpan.textContent = {
+                    'study': '学习',
+                    'work': '工作',
+                    'fun': '娱乐'
+                }[tag];
+                postFooter.appendChild(tagSpan);
+                postElement.appendChild(postFooter);
+
+                return postElement;
             }
 
-            // 发送按钮点击事件
-            sendBtn.addEventListener('click', () => {
-                addPost(messageInput.value);
-            });
-            
-            // 输入框回车事件 (Enter发送, Shift+Enter换行)
-            messageInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault(); // 阻止默认的回车换行行为
-                    addPost(messageInput.value);
+            submitPostBtn.addEventListener('click', () => {
+                const nickname = nicknameInput.value;
+                const message = messageInput.value;
+                const tag = document.querySelector('input[name="tag"]:checked').value;
+
+                if (!message.trim()) {
+                    alert('悄悄话不能为空哦~');
+                    return;
                 }
+                
+                const newPost = createPostElement(nickname, message, uploadedImageSrc, tag);
+                postContainer.appendChild(newPost);
+                
+                // Scroll to new post
+                postContainer.scrollTop = postContainer.scrollHeight;
+                
+                hideModal();
             });
-            
-            // 输入框高度自适应
-            messageInput.addEventListener('input', () => {
-                messageInput.style.height = 'auto';
-                messageInput.style.height = (messageInput.scrollHeight) + 'px';
+
+
+            // --- Filtering Logic ---
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active button style
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const filter = btn.dataset.filter;
+                    const allPosts = postContainer.querySelectorAll('.post');
+                    
+                    allPosts.forEach(post => {
+                        if (filter === 'all' || post.dataset.category === filter) {
+                            post.style.display = 'flex';
+                        } else {
+                            post.style.display = 'none';
+                        }
+                    });
+                });
             });
-            
-            // 页面加载时滚动到底部
-            postContainer.scrollTop = postContainer.scrollHeight;
+
+            // --- Initial Load ---
+            function init() {
+                // Add welcome message
+                const welcomePost = createPostElement(
+                    '💌 系统公告',
+                    '欢迎来到粉色告解室 v2.0！点击右下角的信封按钮开始分享吧~ 记住，所有内容（包括图片）在你刷新页面后都会随风飘走哦~',
+                    null,
+                    'fun'
+                );
+                postContainer.prepend(welcomePost);
+                loadNickname();
+            }
+
+            init();
         });
     </script>
 </body>
